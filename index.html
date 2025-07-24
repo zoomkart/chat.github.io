@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rao Chat App 🔥</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #e3f2fd, #ffffff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-box {
+      width: 100%;
+      max-width: 420px;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+
+    .chat-box h2 {
+      text-align: center;
+      margin-bottom: 15px;
+      color: #1976d2;
+    }
+
+    #messages {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      background: #f9f9f9;
+      margin-bottom: 12px;
+    }
+
+    #messages p {
+      background: #e3f2fd;
+      padding: 8px;
+      margin: 6px 0;
+      border-radius: 6px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-row input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .input-row button {
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .input-row button:hover {
+      background: #1565c0;
+    }
+
+    @media (max-width: 480px) {
+      .chat-box {
+        margin: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="chat-box">
+    <h2>💬 Rao Chat</h2>
+    <div id="messages"></div>
+    <div class="input-row">
+      <input type="text" id="messageInput" placeholder="Type your message..." />
+      <button id="sendBtn">Send</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    // Your Firebase config (already working)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAy-rROqbpemFfhyE1W__7VX1MqStldtTw",
+      authDomain: "rao-chat-app-616aa.firebaseapp.com",
+      projectId: "rao-chat-app-616aa",
+      storageBucket: "rao-chat-app-616aa.firebasestorage.app",
+      messagingSenderId: "414534555566",
+      appId: "1:414534555566:web:acfc097463f8dbcc5c1a3f"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // Anonymous Auth
+    signInAnonymously(auth).catch(e => console.error("Auth error:", e));
+
+    // DOM
+    const messagesDiv = document.getElementById('messages');
+    const input = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    // Send Message
+    sendBtn.onclick = async () => {
+      const msg = input.value.trim();
+      if (msg === "") return;
+      await addDoc(collection(db, "messages"), {
+        text: msg,
+        timestamp: serverTimestamp()
+      });
+      input.value = "";
+    };
+
+    // Real-time updates
+    const q = query(collection(db, "messages"), orderBy("timestamp"));
+    onSnapshot(q, snapshot => {
+      messagesDiv.innerHTML = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        messagesDiv.innerHTML += `<p>${data.text}</p>`;
+      });
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+  </script>
+</body>
+</html>
