@@ -2,145 +2,985 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Rao Chat App 🔥</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TEXT ERA - Chat App by Rao Jatin</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* Custom styles */
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #e3f2fd, #ffffff);
+      overscroll-behavior-y: none;
+      touch-action: pan-y;
+    }
+    .auth-toggle {
+      color: #25D366;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .message-bubble {
+      max-width: 75%;
+      word-wrap: break-word;
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .verified-badge {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: #25D366;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
       display: flex;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
-    }
-
-    .chat-box {
-      width: 100%;
-      max-width: 420px;
-      background: white;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    }
-
-    .chat-box h2 {
-      text-align: center;
-      margin-bottom: 15px;
-      color: #1976d2;
-    }
-
-    #messages {
-      height: 300px;
-      overflow-y: auto;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 10px;
-      background: #f9f9f9;
-      margin-bottom: 12px;
-    }
-
-    #messages p {
-      background: #e3f2fd;
-      padding: 8px;
-      margin: 6px 0;
-      border-radius: 6px;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .input-row input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    .input-row button {
-      background: #1976d2;
+      justify-content: center;
       color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 6px;
+      font-size: 10px;
+      border: 2px solid white;
+    }
+    .dark-mode {
+      background-color: #0B141A;
+      color: #E9EDEF;
+    }
+    .dark-mode .auth-card {
+      background-color: #202C33;
+    }
+    .dark-mode input {
+      background-color: #2A3942;
+      color: white;
+      border-color: #2A3942;
+    }
+    .dark-mode .chat-header {
+      background-color: #202C33;
+      border-color: #303D45;
+    }
+    .dark-mode .message-input-container {
+      background-color: #202C33;
+      border-color: #303D45;
+    }
+    .dark-mode .menu-container {
+      background-color: #233138;
+    }
+    .file-input-label {
+      display: inline-block;
+      padding: 8px 16px;
+      background-color: #25D366;
+      color: white;
+      border-radius: 20px;
+      cursor: pointer;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+    .file-input-label:hover {
+      background-color: #128C7E;
+    }
+    #previewAvatar {
+      display: none;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 10px;
+    }
+    .chat-container {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      background-color: #E5DDD5;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+    }
+    .dark-mode .messages-container {
+      background-color: #0B141A;
+      background-image: none;
+    }
+    .sender-bubble {
+      background-color: #DCF8C6;
+      border-radius: 7.5px 0 7.5px 7.5px;
+    }
+    .dark-mode .sender-bubble {
+      background-color: #005C4B;
+    }
+    .receiver-bubble {
+      background-color: white;
+      border-radius: 0 7.5px 7.5px 7.5px;
+    }
+    .dark-mode .receiver-bubble {
+      background-color: #202C33;
+    }
+    .message-input-container {
+      background-color: #F0F2F5;
+      padding: 8px;
+      position: relative;
+    }
+    .dark-mode .message-input-container {
+      background-color: #202C33;
+    }
+    .message-input-wrapper {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+    }
+    .menu-container {
+      position: fixed;
+      top: 0;
+      right: -300px;
+      width: 280px;
+      height: 100vh;
+      background-color: white;
+      z-index: 20;
+      transition: transform 0.3s ease;
+      box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    }
+    .dark-mode .menu-container {
+      background-color: #233138;
+      box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+    }
+    .menu-open .menu-container {
+      transform: translateX(-300px);
+    }
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 15;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .menu-open .menu-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .reaction-options {
+      display: none;
+      position: absolute;
+      background: white;
+      border-radius: 20px;
+      padding: 5px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 100;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .dark-mode .reaction-options {
+      background: #2d3748;
+    }
+    .emoji-btn {
+      font-size: 20px;
+      padding: 5px;
       cursor: pointer;
     }
-
-    .input-row button:hover {
-      background: #1565c0;
+    .emoji-btn:hover {
+      transform: scale(1.2);
     }
-
-    @media (max-width: 480px) {
-      .chat-box {
-        margin: 10px;
-      }
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto;
+      position: relative;
+    }
+    .profile-avatar-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    .edit-profile-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: #25D366;
+      color: white;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
     }
   </style>
 </head>
-<body>
+<body class="bg-gray-100 transition-colors duration-200">
+  <!-- Auth Container -->
+  <div id="authContainer" class="min-h-screen flex items-center justify-center p-4">
+    <!-- Auth Card -->
+    <div class="bg-white rounded-lg shadow-md p-6 w-full max-w-md dark:bg-gray-800">
+      <!-- Login Form -->
+      <div id="loginForm">
+        <h2 class="text-2xl font-bold mb-4 text-center dark:text-white">Sign In</h2>
+        <div class="mb-4">
+          <label class="block text-gray-700 dark:text-gray-300 mb-2" for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 dark:text-gray-300 mb-2" for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </div>
+        <button id="loginBtn" class="w-full bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 mb-4">Sign In</button>
+        <p class="text-center text-gray-600 dark:text-gray-400">
+          Don't have an account? <span id="showSignup" class="auth-toggle">Sign up</span>
+        </p>
+        <div id="loginError" class="text-red-500 mt-2 text-sm hidden"></div>
+      </div>
 
-  <div class="chat-box">
-    <h2>💬 Rao Chat</h2>
-    <div id="messages"></div>
-    <div class="input-row">
-      <input type="text" id="messageInput" placeholder="Type your message..." />
-      <button id="sendBtn">Send</button>
+      <!-- Signup Form -->
+      <div id="signupForm" class="hidden">
+        <h2 class="text-2xl font-bold mb-4 text-center dark:text-white">Sign Up</h2>
+        <div class="mb-4">
+          <label class="block text-gray-700 dark:text-gray-300 mb-2" for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 dark:text-gray-300 mb-2" for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 dark:text-gray-300 mb-2" for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        </div>
+        <button id="signupBtn" class="w-full bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 mb-4">Sign Up</button>
+        <p class="text-center text-gray-600 dark:text-gray-400">
+          Already have an account? <span id="showLogin" class="auth-toggle">Sign in</span>
+        </p>
+        <div id="signupError" class="text-red-500 mt-2 text-sm hidden"></div>
+      </div>
     </div>
   </div>
 
+  <!-- Profile Setup -->
+  <div id="profileSetup" class="min-h-screen flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-lg shadow-md p-6 w-full max-w-md dark:bg-gray-800">
+      <h2 class="text-2xl font-bold mb-6 text-center dark:text-white">Complete Your Profile</h2>
+      <div class="text-center mb-6">
+        <div class="profile-avatar-wrapper">
+          <img id="previewAvatar" class="profile-avatar">
+          <div id="avatarInitials" class="profile-avatar bg-green-500 text-white flex items-center justify-center mx-auto text-4xl font-bold"></div>
+          <div class="edit-profile-btn" id="avatarUploadBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+            </svg>
+          </div>
+          <input type="file" id="avatarUpload" accept="image/*" class="hidden">
+        </div>
+      </div>
+      <div class="mb-6">
+        <label class="block text-gray-700 dark:text-gray-300 mb-2" for="username">Username</label>
+        <input type="text" id="username" class="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+      </div>
+      <button id="saveProfileBtn" class="w-full bg-green-500 text-white p-3 rounded-lg hover:bg-green-600">Save Profile</button>
+      <div id="profileError" class="text-red-500 mt-2 text-sm hidden"></div>
+    </div>
+  </div>
+
+  <!-- Chat Container -->
+  <div id="chatContainer" class="hidden chat-container">
+    <!-- Chat Header -->
+    <div class="chat-header flex items-center justify-between p-3 bg-green-500 text-white border-b dark:bg-gray-800 dark:border-gray-700">
+      <div class="flex items-center">
+        <button id="menuBtn" class="mr-3 p-1 rounded-full hover:bg-green-600 dark:hover:bg-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <h1 class="text-xl font-bold">TEXT ERA</h1>
+      </div>
+      <div class="flex items-center">
+        <button id="profileBtn" class="p-2 rounded-full hover:bg-green-600 dark:hover:bg-gray-700">
+          <img id="headerAvatar" class="avatar" src="">
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="messages" class="messages-container p-4 pb-20"></div>
+
+    <!-- Message Input -->
+    <div class="message-input-wrapper">
+      <div class="message-input-container border-t dark:border-gray-700">
+        <div class="flex items-center">
+          <input type="text" id="messageInput" placeholder="Type your message..." 
+            class="flex-1 p-3 border rounded-full message-input dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+          <button id="sendBtn" class="ml-2 bg-green-500 text-white p-3 rounded-full hover:bg-green-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+  <div class="menu-container" id="menuContainer">
+    <div class="p-4">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold dark:text-white">Menu</h2>
+        <button id="closeMenuBtn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <div class="mb-6">
+        <div class="flex items-center mb-4">
+          <button id="darkModeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 mr-3">
+            <span id="darkModeIcon">🌙</span>
+          </button>
+          <span class="dark:text-white">Dark Mode</span>
+        </div>
+        
+        <div class="text-sm text-gray-500 dark:text-gray-400 mt-8">
+          <p>TEXT ERA Chat App</p>
+          <p>Made by Rao Jatin</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile View Modal -->
+  <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md dark:bg-gray-800">
+      <div class="text-center mb-6">
+        <div class="relative inline-block">
+          <img id="modalAvatar" class="profile-avatar mx-auto">
+          <div id="modalVerifiedBadge" class="verified-badge hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+        <h2 id="modalUsername" class="text-2xl font-bold mt-4 dark:text-white"></h2>
+        <p id="modalEmail" class="text-gray-600 dark:text-gray-400 mt-1"></p>
+      </div>
+      
+      <div class="flex justify-between">
+        <button id="editProfileBtn" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Edit Profile</button>
+        <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Logout</button>
+      </div>
+      <button id="closeProfileModal" class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, 
+      signOut,
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      collection, 
+      addDoc, 
+      serverTimestamp, 
+      onSnapshot, 
+      query, 
+      orderBy,
+      doc,
+      setDoc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { 
+      getStorage,
+      ref,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
 
-    // Your Firebase config (already working)
+    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyAy-rROqbpemFfhyE1W__7VX1MqStldtTw",
       authDomain: "rao-chat-app-616aa.firebaseapp.com",
       projectId: "rao-chat-app-616aa",
-      storageBucket: "rao-chat-app-616aa.firebasestorage.app",
+      storageBucket: "rao-chat-app-616aa.appspot.com",
       messagingSenderId: "414534555566",
       appId: "1:414534555566:web:acfc097463f8dbcc5c1a3f"
     };
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
     const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
-    // Anonymous Auth
-    signInAnonymously(auth).catch(e => console.error("Auth error:", e));
-
-    // DOM
-    const messagesDiv = document.getElementById('messages');
-    const input = document.getElementById('messageInput');
+    // DOM Elements
+    const authContainer = document.getElementById('authContainer');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const profileSetup = document.getElementById('profileSetup');
+    const chatContainer = document.getElementById('chatContainer');
+    const showSignup = document.getElementById('showSignup');
+    const showLogin = document.getElementById('showLogin');
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const saveProfileBtn = document.getElementById('saveProfileBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const darkModeIcon = document.getElementById('darkModeIcon');
+    const menuBtn = document.getElementById('menuBtn');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const menuContainer = document.getElementById('menuContainer');
+    const profileBtn = document.getElementById('profileBtn');
+    const profileModal = document.getElementById('profileModal');
+    const closeProfileModal = document.getElementById('closeProfileModal');
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    const modalAvatar = document.getElementById('modalAvatar');
+    const modalUsername = document.getElementById('modalUsername');
+    const modalEmail = document.getElementById('modalEmail');
+    const modalVerifiedBadge = document.getElementById('modalVerifiedBadge');
+    const messageInput = document.getElementById('messageInput');
     const sendBtn = document.getElementById('sendBtn');
+    const messagesDiv = document.getElementById('messages');
+    const headerAvatar = document.getElementById('headerAvatar');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const signupEmail = document.getElementById('signupEmail');
+    const signupPassword = document.getElementById('signupPassword');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const usernameInput = document.getElementById('username');
+    const avatarUpload = document.getElementById('avatarUpload');
+    const avatarUploadBtn = document.getElementById('avatarUploadBtn');
+    const previewAvatar = document.getElementById('previewAvatar');
+    const avatarInitials = document.getElementById('avatarInitials');
+    const loginError = document.getElementById('loginError');
+    const signupError = document.getElementById('signupError');
+    const profileError = document.getElementById('profileError');
 
-    // Send Message
-    sendBtn.onclick = async () => {
-      const msg = input.value.trim();
-      if (msg === "") return;
-      await addDoc(collection(db, "messages"), {
-        text: msg,
-        timestamp: serverTimestamp()
-      });
-      input.value = "";
-    };
+    // State
+    let currentUser = null;
+    let darkMode = localStorage.getItem('darkMode') === 'true';
+    let avatarFile = null;
+    let keyboardHeight = 0;
 
-    // Real-time updates
-    const q = query(collection(db, "messages"), orderBy("timestamp"));
-    onSnapshot(q, snapshot => {
-      messagesDiv.innerHTML = "";
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        messagesDiv.innerHTML += `<p>${data.text}</p>`;
-      });
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    // Initialize UI
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+      darkModeIcon.textContent = '☀️';
+    }
+
+    // Event Listeners
+    showSignup.addEventListener('click', () => {
+      loginForm.classList.add('hidden');
+      signupForm.classList.remove('hidden');
+      clearErrors();
     });
+
+    showLogin.addEventListener('click', () => {
+      signupForm.classList.add('hidden');
+      loginForm.classList.remove('hidden');
+      clearErrors();
+    });
+
+    loginBtn.addEventListener('click', handleLogin);
+    signupBtn.addEventListener('click', handleSignup);
+    saveProfileBtn.addEventListener('click', saveProfile);
+    logoutBtn.addEventListener('click', handleLogout);
+    darkModeToggle.addEventListener('click', toggleDarkMode);
+    menuBtn.addEventListener('click', toggleMenu);
+    closeMenuBtn.addEventListener('click', toggleMenu);
+    menuOverlay.addEventListener('click', toggleMenu);
+    profileBtn.addEventListener('click', showProfileModal);
+    closeProfileModal.addEventListener('click', () => {
+      profileModal.classList.add('hidden');
+    });
+    editProfileBtn.addEventListener('click', () => {
+      profileModal.classList.add('hidden');
+      showProfileSetup();
+    });
+    avatarUploadBtn.addEventListener('click', () => {
+      avatarUpload.click();
+    });
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    // Handle keyboard events for mobile
+    messageInput.addEventListener('focus', () => {
+      // On mobile, we need to adjust the input position when keyboard appears
+      if (window.innerWidth <= 768) {
+        setTimeout(() => {
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }, 300);
+      }
+    });
+
+    messageInput.addEventListener('blur', () => {
+      // Reset when keyboard hides
+      if (window.innerWidth <= 768) {
+        setTimeout(() => {
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }, 300);
+      }
+    });
+
+    avatarUpload.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        avatarFile = file;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          previewAvatar.src = event.target.result;
+          previewAvatar.style.display = 'block';
+          avatarInitials.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    usernameInput.addEventListener('input', (e) => {
+      const name = e.target.value.trim();
+      if (name) {
+        avatarInitials.textContent = name.charAt(0).toUpperCase();
+      } else {
+        avatarInitials.textContent = '';
+      }
+    });
+
+    // Auth State Observer
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        checkUserProfile(user.uid);
+      } else {
+        showAuth();
+      }
+    });
+
+    // Functions
+    function toggleDarkMode() {
+      darkMode = !darkMode;
+      localStorage.setItem('darkMode', darkMode);
+      document.body.classList.toggle('dark-mode');
+      darkModeIcon.textContent = darkMode ? '☀️' : '🌙';
+    }
+
+    function toggleMenu() {
+      document.body.classList.toggle('menu-open');
+    }
+
+    function clearErrors() {
+      loginError.classList.add('hidden');
+      signupError.classList.add('hidden');
+      profileError.classList.add('hidden');
+    }
+
+    function showError(element, message) {
+      element.textContent = message;
+      element.classList.remove('hidden');
+    }
+
+    async function handleLogin() {
+      const email = loginEmail.value;
+      const password = loginPassword.value;
+      
+      if (!email || !password) {
+        showError(loginError, 'Please enter both email and password');
+        return;
+      }
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        let errorMessage = 'Login failed. Please try again.';
+        switch (error.code) {
+          case 'auth/invalid-email':
+            errorMessage = 'Invalid email address';
+            break;
+          case 'auth/user-disabled':
+            errorMessage = 'Account disabled';
+            break;
+          case 'auth/user-not-found':
+            errorMessage = 'No account found with this email';
+            break;
+          case 'auth/wrong-password':
+            errorMessage = 'Incorrect password';
+            break;
+        }
+        showError(loginError, errorMessage);
+      }
+    }
+
+    async function handleSignup() {
+      const email = signupEmail.value;
+      const password = signupPassword.value;
+      const confirm = confirmPassword.value;
+      
+      if (!email || !password || !confirm) {
+        showError(signupError, 'Please fill all fields');
+        return;
+      }
+      
+      if (password !== confirm) {
+        showError(signupError, 'Passwords do not match');
+        return;
+      }
+      
+      if (password.length < 6) {
+        showError(signupError, 'Password must be at least 6 characters');
+        return;
+      }
+
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        let errorMessage = 'Signup failed. Please try again.';
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            errorMessage = 'Email already in use';
+            break;
+          case 'auth/invalid-email':
+            errorMessage = 'Invalid email address';
+            break;
+          case 'auth/weak-password':
+            errorMessage = 'Password is too weak';
+            break;
+        }
+        showError(signupError, errorMessage);
+      }
+    }
+
+    async function checkUserProfile(userId) {
+      const userDoc = await getDoc(doc(db, 'users', userId));
+      if (userDoc.exists()) {
+        // Update header avatar
+        headerAvatar.src = userDoc.data().avatarUrl;
+        showChat();
+        loadMessages();
+      } else {
+        showProfileSetup();
+      }
+    }
+
+    async function saveProfile() {
+      const username = usernameInput.value.trim();
+      
+      if (!username) {
+        showError(profileError, 'Please enter a username');
+        return;
+      }
+
+      try {
+        let avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=random`;
+        
+        // Upload avatar if selected
+        if (avatarFile) {
+          const storageRef = ref(storage, `avatars/${currentUser.uid}`);
+          const snapshot = await uploadBytes(storageRef, avatarFile);
+          avatarUrl = await getDownloadURL(snapshot.ref);
+        }
+
+        // Save user profile
+        await setDoc(doc(db, 'users', currentUser.uid), {
+          displayName: username,
+          avatarUrl: avatarUrl,
+          createdAt: serverTimestamp()
+        });
+
+        // Update header avatar
+        headerAvatar.src = avatarUrl;
+        showChat();
+        loadMessages();
+      } catch (error) {
+        showError(profileError, 'Error saving profile: ' + error.message);
+      }
+    }
+
+    function showAuth() {
+      authContainer.classList.remove('hidden');
+      profileSetup.classList.add('hidden');
+      chatContainer.classList.add('hidden');
+      loginForm.classList.remove('hidden');
+      signupForm.classList.add('hidden');
+      clearFormInputs();
+    }
+
+    function showProfileSetup() {
+      authContainer.classList.add('hidden');
+      profileSetup.classList.remove('hidden');
+      chatContainer.classList.add('hidden');
+      
+      // Reset profile form
+      usernameInput.value = '';
+      avatarUpload.value = '';
+      avatarFile = null;
+      previewAvatar.style.display = 'none';
+      avatarInitials.style.display = 'block';
+      avatarInitials.textContent = '';
+      clearErrors();
+    }
+
+    function showChat() {
+      authContainer.classList.add('hidden');
+      profileSetup.classList.add('hidden');
+      chatContainer.classList.remove('hidden');
+      messageInput.focus();
+    }
+
+    async function showProfileModal() {
+      if (!currentUser) return;
+      
+      const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+      if (userDoc.exists()) {
+        modalAvatar.src = userDoc.data().avatarUrl;
+        modalUsername.textContent = userDoc.data().displayName;
+        modalEmail.textContent = currentUser.email;
+        
+        // Show verified badge for raoscomedy@gmail.com
+        if (currentUser.email === 'raoscomedy@gmail.com') {
+          modalVerifiedBadge.classList.remove('hidden');
+        } else {
+          modalVerifiedBadge.classList.add('hidden');
+        }
+        
+        profileModal.classList.remove('hidden');
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        await signOut(auth);
+        profileModal.classList.add('hidden');
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
+    }
+
+    function clearFormInputs() {
+      loginEmail.value = '';
+      loginPassword.value = '';
+      signupEmail.value = '';
+      signupPassword.value = '';
+      confirmPassword.value = '';
+      clearErrors();
+    }
+
+    async function sendMessage() {
+      const messageText = messageInput.value.trim();
+      if (!messageText) return;
+      
+      const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+      const userData = userDoc.data();
+      
+      try {
+        await addDoc(collection(db, 'messages'), {
+          text: messageText,
+          userId: currentUser.uid,
+          displayName: userData.displayName,
+          avatarUrl: userData.avatarUrl,
+          createdAt: serverTimestamp(),
+          reactions: {}
+        });
+        
+        messageInput.value = '';
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
+    }
+
+    function loadMessages() {
+      const q = query(collection(db, 'messages'), orderBy('createdAt'));
+      
+      onSnapshot(q, (snapshot) => {
+        messagesDiv.innerHTML = '';
+        
+        snapshot.forEach((doc) => {
+          const message = doc.data();
+          displayMessage(message, doc.id);
+        });
+        
+        // Scroll to bottom
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      });
+    }
+
+    function displayMessage(message, messageId) {
+      const isCurrentUser = message.userId === currentUser?.uid;
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `flex mb-4 ${isCurrentUser ? 'justify-end' : 'justify-start'}`;
+      
+      if (!isCurrentUser) {
+        // Receiver's message (left side)
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'flex-shrink-0 mr-2';
+        
+        const avatarImg = document.createElement('img');
+        avatarImg.src = message.avatarUrl;
+        avatarImg.className = 'avatar';
+        avatarImg.alt = message.displayName;
+        avatarImg.onclick = () => showUserProfile(message.userId);
+        
+        avatarDiv.appendChild(avatarImg);
+        messageDiv.appendChild(avatarDiv);
+      }
+      
+      // Message content
+      const contentDiv = document.createElement('div');
+      contentDiv.className = `message-bubble ${isCurrentUser ? 'sender-bubble' : 'receiver-bubble'} p-3`;
+      
+      if (!isCurrentUser) {
+        // Receiver's name
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'font-bold text-xs block mb-1 text-gray-600 dark:text-gray-400';
+        nameSpan.textContent = message.displayName;
+        contentDiv.appendChild(nameSpan);
+      }
+      
+      // Message text
+      const textSpan = document.createElement('span');
+      textSpan.className = 'text-gray-800 dark:text-white';
+      textSpan.textContent = message.text;
+      contentDiv.appendChild(textSpan);
+      
+      // Reactions
+      if (message.reactions && Object.keys(message.reactions).length > 0) {
+        const reactionsDiv = document.createElement('div');
+        reactionsDiv.className = 'flex mt-1';
+        
+        Object.entries(message.reactions).forEach(([emoji, users]) => {
+          if (users && users.length > 0) {
+            const reactionSpan = document.createElement('span');
+            reactionSpan.className = 'text-xs bg-white dark:bg-gray-700 rounded-full px-1 mr-1';
+            reactionSpan.textContent = `${emoji} ${users.length}`;
+            reactionsDiv.appendChild(reactionSpan);
+          }
+        });
+        
+        contentDiv.appendChild(reactionsDiv);
+      }
+      
+      // Timestamp
+      const timeSpan = document.createElement('span');
+      timeSpan.className = 'block text-xs mt-1 text-gray-500 dark:text-gray-400 text-right';
+      const timestamp = message.createdAt?.toDate ? message.createdAt.toDate() : new Date();
+      timeSpan.textContent = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      contentDiv.appendChild(timeSpan);
+      
+      // Add long press for reactions
+      contentDiv.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        showReactionOptions(e, messageId, contentDiv);
+      });
+      
+      messageDiv.appendChild(contentDiv);
+      messagesDiv.appendChild(messageDiv);
+    }
+
+    async function showUserProfile(userId) {
+      const userDoc = await getDoc(doc(db, 'users', userId));
+      if (userDoc.exists()) {
+        modalAvatar.src = userDoc.data().avatarUrl;
+        modalUsername.textContent = userDoc.data().displayName;
+        modalEmail.textContent = userId === currentUser.uid ? currentUser.email : '';
+        
+        // Show verified badge for raoscomedy@gmail.com
+        if (userId === currentUser.uid && currentUser.email === 'raoscomedy@gmail.com') {
+          modalVerifiedBadge.classList.remove('hidden');
+        } else {
+          modalVerifiedBadge.classList.add('hidden');
+        }
+        
+        // Hide edit and logout buttons for other users
+        editProfileBtn.style.display = userId === currentUser.uid ? 'block' : 'none';
+        logoutBtn.style.display = userId === currentUser.uid ? 'block' : 'none';
+        
+        profileModal.classList.remove('hidden');
+      }
+    }
+
+    function showReactionOptions(event, messageId, messageElement) {
+      // Remove any existing reaction options
+      document.querySelectorAll('.reaction-options').forEach(el => el.remove());
+      
+      const reactions = ['👍', '❤️', '😂', '😮', '😢', '👎'];
+      const optionsDiv = document.createElement('div');
+      optionsDiv.className = 'reaction-options flex space-x-1 p-1';
+      
+      reactions.forEach(emoji => {
+        const emojiBtn = document.createElement('button');
+        emojiBtn.className = 'emoji-btn';
+        emojiBtn.textContent = emoji;
+        emojiBtn.addEventListener('click', () => addReaction(messageId, emoji));
+        optionsDiv.appendChild(emojiBtn);
+      });
+      
+      // Position the options near the message
+      const rect = messageElement.getBoundingClientRect();
+      optionsDiv.style.bottom = `${window.innerHeight - rect.top + 10}px`;
+      optionsDiv.style.left = `${rect.left}px`;
+      
+      document.body.appendChild(optionsDiv);
+      
+      // Close on click outside
+      setTimeout(() => {
+        const clickHandler = (e) => {
+          if (!optionsDiv.contains(e.target)) {
+            optionsDiv.remove();
+            document.removeEventListener('click', clickHandler);
+          }
+        };
+        document.addEventListener('click', clickHandler);
+      }, 0);
+    }
+
+    async function addReaction(messageId, emoji) {
+      const messageRef = doc(db, 'messages', messageId);
+      const messageDoc = await getDoc(messageRef);
+      const currentReactions = messageDoc.data().reactions || {};
+      
+      // Initialize array for this emoji if not exists
+      if (!currentReactions[emoji]) {
+        currentReactions[emoji] = [];
+      }
+      
+      // Remove user from any other reaction they might have
+      Object.keys(currentReactions).forEach(e => {
+        if (Array.isArray(currentReactions[e])) {
+          currentReactions[e] = currentReactions[e].filter(uid => uid !== currentUser.uid);
+        }
+      });
+      
+      // Add user to this reaction if not already there
+      if (!currentReactions[emoji].includes(currentUser.uid)) {
+        currentReactions[emoji].push(currentUser.uid);
+      }
+      
+      // Update in Firestore
+      await setDoc(messageRef, { reactions: currentReactions }, { merge: true });
+      
+      // Remove reaction options
+      document.querySelectorAll('.reaction-options').forEach(el => el.remove());
+    }
   </script>
 </body>
 </html>
